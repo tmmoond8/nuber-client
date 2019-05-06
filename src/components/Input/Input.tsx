@@ -27,19 +27,25 @@ interface IProps {
   type?: string;
   required?: boolean;
   value: string;
+  onChange: any;
+  name: string;
 }
 
 const Input: React.SFC<IProps> = ({ 
   placeholder = "",
   type = "text",
   required = true,
-  value
+  value, 
+  onChange,
+  name = "",
 }) => (
   <Container 
     placeholder={placeholder}
     type={type}
     required={required}
     value={value}
+    onChange={onChange}
+    name={name}
   />
 );
 export default Input;
