@@ -17,7 +17,7 @@ const Container = styled.input`
     outline: none;
   }
   &::placeholder {
-    color: $(props => props.theme.greyColor);
+    color: ${props => props.theme.greyColor};
     font-weight: 300;
   }
 `;
