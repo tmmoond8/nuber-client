@@ -1,12 +1,13 @@
 import React from "react";
 import { Mutation } from "react-apollo";
 import { RouteComponentProps } from "react-router-dom";
+import { toast } from "react-toastify";
 import { verfiyPhone, verfiyPhoneVariables } from "../../types/api";
 import { VERIFY_PHONE } from "./VerifyPhone.queries";
 import VerifyPhonePresenter from "./VerifyPhonePresenter";
 
 interface IState {
-  key: string;
+  verificationCode: string;
   phoneNumber: string;
 }
 
@@ -22,24 +23,39 @@ class VerifyPhoneContainer extends React.Component<IProps, IState> {
     } catch (e) {
       props.history.push("/");
     }
-     this.state = {
-       key: "",
-       phoneNumber: props.location.state.phone
-     }
-     this.onInputChange = this.onInputChange.bind(this);
+    this.state = {
+      phoneNumber: props.location.state.phone,
+      verificationCode: ""
+    }
+    this.onInputChange = this.onInputChange.bind(this);
   }
   public render() {
-    const { key, phoneNumber } = this.state;
+    const { verificationCode, phoneNumber } = this.state;
     return (
       <VerifyMutation
         mutation={VERIFY_PHONE}
         variables={{
-          key,
+          key: verificationCode,
           phoneNumber
+        }}
+        onCompleted={data => {
+          const { CompletePhoneVerification } = data;
+          if (CompletePhoneVerification.ok) {
+            toast.success("You're verified, loggin in now");
+            // tslint:disable-next-line
+            console.log(CompletePhoneVerification);
+          } else {
+            toast.error(CompletePhoneVerification.error);
+          }
         }}
       >
         { (mutation, { loading }) => (
-          <VerifyPhonePresenter onChange={this.onInputChange} key={key}/>
+          <VerifyPhonePresenter 
+            onSubmit={mutation}
+            onChange={this.onInputChange} 
+            verificationCode={verificationCode}
+            loading={loading}
+          />
         )}
       </VerifyMutation>
     );
