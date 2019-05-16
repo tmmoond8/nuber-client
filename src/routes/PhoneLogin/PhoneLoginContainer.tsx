@@ -32,7 +32,7 @@ class PhoneLoginContainer extends React.Component<
   public render() {
     const { history } = this.props;
     const { countryCode, phoneNumber } = this.state;
-    const phone = `${countryCode}${phoneNumber}`;
+    const phone = `${countryCode}-${phoneNumber}`;
     return (
       <PhoneSignInMutation
         mutation={PHONE_SIGN_IN}
