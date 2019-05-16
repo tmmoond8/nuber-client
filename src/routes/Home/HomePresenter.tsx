@@ -1,3 +1,4 @@
+import Menu from "components/Menu";
 import React from "react";
 import Helmet from "react-helmet";
 import Sidebar from "react-sidebar";
@@ -16,7 +17,7 @@ const HomePresenter: React.SFC<IProps> = ({ isMenuOpen, toggleMenu }) => (
       <title>Home | Nuber</title>
     </Helmet>
     <Sidebar
-      sidebar={<b>Sidebar contents</b>}
+      sidebar={<Menu/>}
       open={isMenuOpen}
       onSetOpen={toggleMenu}
       styles={{
