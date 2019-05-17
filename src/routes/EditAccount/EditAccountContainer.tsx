@@ -101,11 +101,11 @@ class EditAccountContainer extends React.Component<IProps, IState> {
       formData.append("api_key", "193243387542668");
       formData.append("upload_preset", "xtaoaopp");
       formData.append("timestamp", String(Date.now() / 1000));
-      const request = await axios.post(
+      const response = await axios.post(
         "https://api.cloudinary.com/v1_1/dgggcrkxq/image/upload",
         formData
       );
-      console.log(request);
+      console.log(response);
     }
 
     this.setState({
