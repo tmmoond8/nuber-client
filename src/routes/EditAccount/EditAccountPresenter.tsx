@@ -50,7 +50,7 @@ const EditAccountPresenter: React.SFC<IProps> = ({
     </Helmet>
     <Header title="Edit Account" backTo={"/"}/>
     <Photo src={profilePhoto}/>
-    <ExtendedForm submitFn={null}>
+    <ExtendedForm submitFn={onSubmit}>
       <ExtendedInput
         onChange={onInputChange}
         type="text"
