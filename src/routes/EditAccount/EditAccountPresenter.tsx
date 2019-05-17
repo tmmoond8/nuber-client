@@ -3,6 +3,7 @@ import Form from "components/Form";
 import Header from "components/Header";
 import Input from "components/Input";
 import React from "react";
+import { MutationFn } from "react-apollo";
 import Helmet from "react-helmet";
 import styled from "../../typed-components";
 
@@ -29,6 +30,7 @@ interface IProps {
   lastName: string;
   email: string;
   profilePhoto: string;
+  onSubmit?: MutationFn;
   onInputChange: React.ChangeEventHandler<HTMLInputElement>;
   loading?: boolean;
 }
@@ -38,6 +40,7 @@ const EditAccountPresenter: React.SFC<IProps> = ({
   lastName,
   email,
   profilePhoto,
+  onSubmit,
   onInputChange,
   loading
 }) => (
