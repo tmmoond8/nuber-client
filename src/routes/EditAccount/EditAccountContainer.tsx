@@ -77,7 +77,7 @@ class EditAccountContainer extends React.Component<IProps, IState> {
                 profilePhoto={profilePhoto}
                 onInputChange={this.onInputChange}
                 loading={updateLoading || loading}
-                onSubmit={updateProfileMutation}
+                onSubmit={() => updateProfileMutation()}
                 uploading={uploading}
               />
             )}
