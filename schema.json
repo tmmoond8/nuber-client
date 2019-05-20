@@ -47,7 +47,7 @@
             "deprecationReason": null
           },
           {
-            "name": "GetMyPlace",
+            "name": "GetMyPlaces",
             "description": "",
             "args": [],
             "type": {
@@ -55,7 +55,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "GetMyPlaceResponse",
+                "name": "GetMyPlacesResponse",
                 "ofType": null
               }
             },
@@ -1375,7 +1375,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "GetMyPlaceResponse",
+        "name": "GetMyPlacesResponse",
         "description": "",
         "fields": [
           {
