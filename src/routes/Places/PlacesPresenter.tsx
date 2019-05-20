@@ -32,7 +32,7 @@ const PlacesPresenter: React.SFC<IProps> = ({
       {!loading &&
         places &&
         places.length === 0 
-        ? (<SLink to="/add-place">Place add some places!</SLink>)
+        ? <p>You have no Places</p>
         : places && places!.map(place => <Place
           key={place!.id}
           fav={place!.isFav}
@@ -40,6 +40,7 @@ const PlacesPresenter: React.SFC<IProps> = ({
           address={place!.address}
         />)
       }
+      <SLink to="/add-place">Place add some places!</SLink>
     </Container>
   </React.Fragment>
 )

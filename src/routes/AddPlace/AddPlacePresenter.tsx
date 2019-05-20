@@ -3,6 +3,7 @@ import Form from "components/Form";
 import Header from "components/Header";
 import Input from "components/Input";
 import React from "react";
+import { MutationFn } from "react-apollo";
 import Helmet from "react-helmet";
 import { Link } from "react-router-dom";
 import styled from "../../typed-components";
@@ -26,13 +27,15 @@ interface IProps {
   name: string;
   onInputChange: React.ChangeEventHandler<HTMLInputElement>;
   loading: boolean;
+  onSubmit: MutationFn;
 }
 
 const AddPlacePresenter: React.SFC<IProps> = ({
   onInputChange,
   address,
   name,
-  loading
+  loading,
+  onSubmit
 }) => (
   <React.Fragment>
     <Helmet>
@@ -40,7 +43,7 @@ const AddPlacePresenter: React.SFC<IProps> = ({
     </Helmet>
     <Header title="Add Place" backTo="/"/>
     <Container>
-      <Form submitFn={null}>
+      <Form submitFn={onSubmit}>
         <ExtendedInput
           placeholder="Name"
           type="text"
