@@ -86,7 +86,8 @@ const SettingsPresenter: React.SFC<IProps> = ({
             key={place!.id}
             name={place!.name} 
             address={place!.address}
-            fav={place!.isFav} 
+            fav={place!.isFav}
+            id={place!.id}
           />
         ))
       }

@@ -38,6 +38,7 @@ const PlacesPresenter: React.SFC<IProps> = ({
           fav={place!.isFav}
           name={place!.name}
           address={place!.address}
+          id={place!.id}
         />)
       }
       <SLink to="/add-place">Place add some places!</SLink>
