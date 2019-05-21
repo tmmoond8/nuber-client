@@ -7,6 +7,7 @@ import { MutationFn } from "react-apollo";
 import Helmet from "react-helmet";
 import { Link } from "react-router-dom";
 import styled from "../../typed-components";
+import { addPlace, addPlaceVariables } from "../../types/api";
 
 const Container = styled.div`
   padding: 0 40px;
@@ -27,7 +28,7 @@ interface IProps {
   name: string;
   onInputChange: React.ChangeEventHandler<HTMLInputElement>;
   loading: boolean;
-  onSubmit: MutationFn;
+  onSubmit: MutationFn<addPlace, addPlaceVariables>;
 }
 
 const AddPlacePresenter: React.SFC<IProps> = ({

@@ -1,6 +1,7 @@
 import React from "react";
 import { MutationFn } from "react-apollo";
 import styled from "../../typed-components";
+import { editPlace, editPlaceVariables } from "../../types/api";
 
 const Place = styled.div`
   margin: 15px 0;
@@ -32,7 +33,7 @@ interface IProps {
   fav: boolean;
   name: string;
   address: string;
-  onToggleStar: MutationFn;
+  onToggleStar: MutationFn<editPlace, editPlaceVariables>;
 }
 
 const PlacePresenter: React.SFC<IProps> = ({ onToggleStar, fav, name, address }) => (
