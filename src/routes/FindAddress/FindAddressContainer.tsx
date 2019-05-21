@@ -2,7 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import FindAddressPresenter from "./FindAddressPresenter";
 
-class FIndAddressContainer extends React.Component<any> {
+interface IState {
+  lat: number;
+  lng: number;
+}
+
+class FIndAddressContainer extends React.Component<any, IState> {
   public mapRef: any;
   public map: google.maps.Map;
 
@@ -28,11 +33,15 @@ class FIndAddressContainer extends React.Component<any> {
     const {
       coords: { latitude, longitude }
     } = position;
+    this.setState({
+      lat: latitude,
+      lng: longitude
+    })
     this.loadMap(latitude, longitude);
   }
 
   public handleGeoError = () => {
-    this.loadMap(37.5665, 126.9780);
+    console.error('No postion');
   }
 
   public loadMap = (lat, lng) => {
@@ -48,6 +57,18 @@ class FIndAddressContainer extends React.Component<any> {
       zoom: 11
     } 
     this.map = new maps.Map(mapNode, mapConfig);
+    this.map.addListener("dragend", this.handleDragEnd);
+  }
+
+  public handleDragEnd = () => {
+    const newCenter = this.map.getCenter();
+    const lat = newCenter.lat();
+    const lng = newCenter.lng();
+    console.log(lat, lng);
+    this.setState({
+      lat,
+      lng
+    })
   }
 }
 
