@@ -1,6 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import { GoogleApiWrapper } from "google-maps-react";
 import FindAddressContainer from "./FindAddressContainer";
 
 export default GoogleApiWrapper({
-  apiKey: "AIzaSyDv9V9YxJgQeIpC-Gq72TPHZ6UzHa_tWxI"
+  apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY
 })(FindAddressContainer);

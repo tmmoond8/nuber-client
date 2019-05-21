@@ -5,6 +5,8 @@
   "dependencies": {
     "apollo-boost": "^0.3.1",
     "axios": "^0.18.0",
+    "dotenv": "^8.0.0",
+    "env-cmd": "^9.0.1",
     "google-maps-react": "^2.0.2",
     "graphql": "^14.2.1",
     "react": "^16.8.6",
@@ -22,7 +24,7 @@
   "scripts": {
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "dev": "react-scripts-ts start",
+    "dev": "env-cmd .env react-scripts-ts start",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
     "precodegen": "apollo schema:download --endpoint=http://localhost:4000/graphql",
@@ -30,6 +32,7 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/dotenv": "^6.1.1",
     "@types/googlemaps": "^3.36.0",
     "@types/jest": "^24.0.12",
     "@types/node": "^11.13.8",
