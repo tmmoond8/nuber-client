@@ -19,11 +19,15 @@ interface IProps extends RouteComponentProps<any> {}
 class AddPlaceMutation extends Mutation<addPlace, addPlaceVariables> {}
 
 class AddPlaceContainer extends React.Component<IProps, IState> {
-  public state = {
-    address: "",
-    lat: 1.34,
-    lng: 1.44,
-    name: ""
+  constructor(props: IProps) {
+    super(props);
+    const { location: { state = {} } = {} } = props;
+    this.state = {
+      address: state.address || "",
+      lat: state.lat || 0,
+      lng: state.lng || 0,
+      name: ""
+    };
   }
 
   public render() {
@@ -58,7 +62,7 @@ class AddPlaceContainer extends React.Component<IProps, IState> {
             address={address}
             name={name}
             loading={loading}
-            onSubmit={addPlaceMutaion}
+            onSubmit={() => this.validatePlace(addPlaceMutaion)}
           />
         )}
       </AddPlaceMutation>
@@ -75,6 +79,15 @@ class AddPlaceContainer extends React.Component<IProps, IState> {
     this.setState({
       [name]: value
     } as any);
+  }
+
+  public validatePlace(mutation) {
+    const { lat, lng } = this.state;
+    if (lat === 0 && lng === 0) {
+      toast.error("Invalid Position Info");
+      return;
+    }
+    mutation();
   }
 }
 
