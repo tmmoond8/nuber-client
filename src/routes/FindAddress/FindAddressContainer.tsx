@@ -11,7 +11,7 @@ interface IState {
 
 class FIndAddressContainer extends React.Component<any, IState> {
   public mapRef: any;
-  public map: google.maps.Map;
+  public map: google.maps.Map | null;
   public state ={
     address: "",
     lat: 0,
@@ -21,6 +21,7 @@ class FIndAddressContainer extends React.Component<any, IState> {
   constructor(props) {
     super(props);
     this.mapRef = React.createRef();
+    this.map = null;
   }
 
   public componentDidMount() {
@@ -70,11 +71,11 @@ class FIndAddressContainer extends React.Component<any, IState> {
       zoom: 11
     } 
     this.map = new maps.Map(mapNode, mapConfig);
-    this.map.addListener("dragend", this.handleDragEnd);
+    this.map!.addListener("dragend", this.handleDragEnd);
   }
 
   public handleDragEnd = async () => {
-    const newCenter = this.map.getCenter();
+    const newCenter = this.map!.getCenter();
     const lat = newCenter.lat();
     const lng = newCenter.lng();
     const address = await reverseGeoCode(lat, lng);

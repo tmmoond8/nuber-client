@@ -1,7 +1,6 @@
-import dotenv from "dotenv";
-dotenv.config();
 import axios from "axios";
 import { toast } from "react-toastify";
+require("dotenv").config();
 
 export const getCode = () => null;
 export const reverseGeoCode = async (lat: number, lng: number) => {
@@ -11,6 +10,7 @@ export const reverseGeoCode = async (lat: number, lng: number) => {
     toast.error(data.error_message);;
   } else {
     const { results } = data;
+		console.log(results)
     const firstPlace = results[0];
     if(firstPlace) {
       return firstPlace!.formatted_address;
