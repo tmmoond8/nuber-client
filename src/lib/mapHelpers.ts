@@ -1,13 +1,20 @@
 import axios from "axios";
+import dotenv from "dotenv";
 import { toast } from "react-toastify";
-require("dotenv").config();
 
-export const getCode = () => null;
+dotenv.config();
+
+export const getCode = async (address: string) => {
+  const URL = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
+  const { data } = await axios(URL);
+  console.log(data);
+};
 export const reverseGeoCode = async (lat: number, lng: number) => {
   const URL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
   const { data } = await axios(URL);
   if(data.error_message) {
-    toast.error(data.error_message);;
+    toast.error(data.error_message);
+    return false;
   } else {
     const { results } = data;
 		console.log(results)
