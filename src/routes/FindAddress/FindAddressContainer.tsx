@@ -69,6 +69,7 @@ class FIndAddressContainer extends React.Component<any, IState> {
         lng
       },
       disableDefaultUI: true,
+      minZoom: 8,
       zoom: 11
     } 
     this.map = new maps.Map(mapNode, mapConfig);
@@ -76,6 +77,7 @@ class FIndAddressContainer extends React.Component<any, IState> {
   }
 
   public handleDragEnd = () => {
+    if (!this.map) { return };
     const newCenter = this.map!.getCenter();
     const lat = newCenter.lat();
     const lng = newCenter.lng();
@@ -96,10 +98,19 @@ class FIndAddressContainer extends React.Component<any, IState> {
     } as any);
   };
 
-  public onInputBlur = () => {
-    console.log("Address update!")
+  public onInputBlur = async () => {
+    if (!this.map) { return };
     const { address } = this.state;
-    getCode(address);
+    const result = await getCode(address);
+    if (result !== false ) {
+      const { lat, lng, formatted_address } = result;
+      this.setState({
+        address: formatted_address,
+        lat,
+        lng
+      });
+      this.map.panTo({ lat, lng });
+    }
   }
 
   public reverseGeocodeAddress = async (lat: number, lng: number) => {
