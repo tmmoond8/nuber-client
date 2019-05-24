@@ -37,7 +37,6 @@ export const reverseGeoCode = async (lat: number, lng: number) => {
     return false;
   } else {
     const { results } = data;
-		console.log(results)
     const firstPlace = results[0];
     if(firstPlace) {
       return firstPlace!.formatted_address;
