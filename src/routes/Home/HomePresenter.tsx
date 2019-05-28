@@ -5,6 +5,7 @@ import React from "react";
 import Helmet from "react-helmet";
 import Sidebar from "react-sidebar";
 import styled from "../../typed-components";
+import { userProfile } from "../../types/api";
 
 const Container = styled.div``;
 
@@ -50,6 +51,7 @@ interface IProps {
   onAddressSubmit: any;
   onInputChange: React.ChangeEventHandler<HTMLInputElement>;
   price: number;
+  data?: userProfile;
 }
 
 const HomePresenter: React.SFC<IProps> = ({
@@ -60,7 +62,8 @@ const HomePresenter: React.SFC<IProps> = ({
   toAddress,
   onInputChange,
   onAddressSubmit,
-  price
+  price,
+  data: { GetMyProfile: { user = null } = {} } = { GetMyProfile: {}},
 }) => (
   <Container>
     <Helmet>
@@ -81,12 +84,21 @@ const HomePresenter: React.SFC<IProps> = ({
       {!loading && (<MenuButton onClick={toggleMenu}>
         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fillRule="evenodd" clipRule="evenodd"><path d="M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z" fill="#1040e2"/><path d="M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z"/></svg>
       </MenuButton>)}
-      <AddressBar
-        name="toAddress"
-        onChange={onInputChange}
-        value={toAddress}
-        onBlur={() => ""}
-      />
+      {user && !user.isDriving && (
+        <React.Fragment>
+          <AddressBar
+            name="toAddress"
+            onChange={onInputChange}
+            value={toAddress}
+            onBlur={() => ""}
+          />
+          <ExtendedButton
+            onClick={onAddressSubmit}
+            disabled={toAddress === ""}
+            value={price ? "Change address" : "Pick Address"}
+          />
+        </React.Fragment>
+      )}
       {!price ? false : (
         <RequestButton
           onClick={onAddressSubmit}
@@ -94,11 +106,6 @@ const HomePresenter: React.SFC<IProps> = ({
           value={`Request Ride ($${price})`}
         />
       )}
-      <ExtendedButton
-        onClick={onAddressSubmit}
-        disabled={toAddress === ""}
-        value={price ? "Change address" : "Pick Address"}
-      />
       <Map ref={mapRef}/>
     </Sidebar>
   </Container>
