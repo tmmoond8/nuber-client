@@ -74,6 +74,7 @@ class HomeContainer extends React.Component<IProps, IState> {
         {({ data, loading: profileLoading}) => (
           <NearbyQuery 
             query={GET_NEARBY_DRIVERS}
+            pollInterval={1000}
             skip={
               !!( data &&
                 data.GetMyProfile &&
