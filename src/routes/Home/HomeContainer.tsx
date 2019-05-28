@@ -69,8 +69,18 @@ class HomeContainer extends React.Component<IProps, IState> {
     const { isMenuOpen, toAddress, price } = this.state;
     return (
       <ProfileQuery query={USER_PROFILE}>
-        {({ data= {}, loading: profileLoading}) => (
-          <NearbyQuery query={GET_NEARBY_DRIVERS}>
+        {({ data, loading: profileLoading}) => (
+          <NearbyQuery 
+            query={GET_NEARBY_DRIVERS}
+            skip={
+              ( data &&
+                data.GetMyProfile &&
+                data.GetMyProfile.user &&
+                data.GetMyProfile.user.isDriving
+              ) || false
+            }
+            onCompleted={this.handleNearbyDrivers}
+          >
             {() => (
               <HomePresenter 
                 loading={profileLoading}
@@ -265,6 +275,17 @@ class HomeContainer extends React.Component<IProps, IState> {
   public carculatePrice = (distance: number) => {
     return distance ? Number.parseFloat((distance * 0.003).toFixed(2)) : 0
   };
+
+  public handleNearbyDrivers = (data: {} | getDrivers) => {
+    if ("GetNearbyDrivers" in data) {
+      const {
+        GetNearbyDrivers: { drivers, ok }
+      } = data;
+      if (ok && drivers) {
+        console.log(drivers);
+      }
+    }
+  }
 };
 
 export default graphql<any, reportMovement, reportMovementVariables> (
