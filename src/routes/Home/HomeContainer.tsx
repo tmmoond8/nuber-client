@@ -27,6 +27,7 @@ class HomeContainer extends React.Component<IProps, IState> {
   public map: google.maps.Map;
   public userMarker: google.maps.Marker | null = null;
   public toMarker: google.maps.Marker | null = null;
+  public direction: google.maps.DirectionsRenderer | null = null;
 
   public state = {
     isMenuOpen: false,
@@ -147,7 +148,6 @@ class HomeContainer extends React.Component<IProps, IState> {
       [name]: value
     } as any);
   }
-
   public onAddressSubmit = async () => {
     const { toAddress } = this.state;
     const { google } = this.props;
@@ -155,11 +155,7 @@ class HomeContainer extends React.Component<IProps, IState> {
     const result = await getCode(toAddress);
     if (result !== false ) {
       const { lat, lng, formatted_address: formattedAddress } = result;
-      this.setState({
-        toAddress: formattedAddress,
-        toLat: lat,
-        toLng: lng
-      });
+      
       if (this.toMarker) {
         this.toMarker.setMap(null);
       }
@@ -171,7 +167,22 @@ class HomeContainer extends React.Component<IProps, IState> {
       };
       this.toMarker = new maps.Marker(toMarkerOptions);
       this.toMarker!.setMap(this.map);
+      
+      this.setState({
+        toAddress: formattedAddress,
+        toLat: lat,
+        toLng: lng
+      }, this.setBounds);
     }
+  }
+
+  public setBounds = () => {
+    const { lat, lng, toLat, toLng } = this.state;
+    const { google: { maps } } = this.props;
+    const bounds = new maps.LatLngBounds();
+    bounds.extend({ lat, lng });
+    bounds.extend({ lat: toLat, lng: toLng });
+    this.map!.fitBounds(bounds);
   }
 };
 
