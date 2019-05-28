@@ -3,6 +3,7 @@ import React from "react";
 import { Query } from "react-apollo";
 import ReactDOM from 'react-dom';
 import { RouteComponentProps } from "react-router";
+import { toast } from 'react-toastify';
 import { USER_PROFILE } from "sharedQueries.queries";
 import { userProfile } from "../../types/api";
 import HomePresenter from "./HomePresenter";
@@ -27,7 +28,7 @@ class HomeContainer extends React.Component<IProps, IState> {
   public map: google.maps.Map;
   public userMarker: google.maps.Marker | null = null;
   public toMarker: google.maps.Marker | null = null;
-  public direction: google.maps.DirectionsRenderer | null = null;
+  public directions: google.maps.DirectionsRenderer | null = null;
 
   public state = {
     isMenuOpen: false,
@@ -172,7 +173,10 @@ class HomeContainer extends React.Component<IProps, IState> {
         toAddress: formattedAddress,
         toLat: lat,
         toLng: lng
-      }, this.setBounds);
+      }, () => {
+        this.setBounds();
+        this.createPath();
+      });
     }
   }
 
@@ -183,6 +187,38 @@ class HomeContainer extends React.Component<IProps, IState> {
     bounds.extend({ lat, lng });
     bounds.extend({ lat: toLat, lng: toLng });
     this.map!.fitBounds(bounds);
+  }
+  public createPath = () => {
+    const { lat, lng, toLat, toLng } = this.state;
+    const { google } = this.props;
+    if (this.directions) {
+      this.directions.setMap(null);
+    }
+    const renderOptions: google.maps.DirectionsRendererOptions = {
+      polylineOptions: {
+        strokeColor: "#000"
+      },
+      suppressMarkers: true
+    }
+
+    this.directions = new google.maps.DirectionsRenderer(renderOptions);
+    const directionsService: google.maps.DirectionsService = new google.maps.DirectionsService();
+    const from = new google.maps.LatLng(lat, lng);
+    const to = new google.maps.LatLng(toLat, toLng);
+    const directionsOptions:google.maps.DirectionsRequest = {
+      destination: to,
+      origin: from,
+      travelMode: google.maps.TravelMode.DRIVING
+    };
+    
+    directionsService.route(directionsOptions, (result, status) => {
+      if (status === google.maps.DirectionsStatus.OK) {
+        this.directions!.setDirections(result);
+        this.directions!.setMap(this.map)
+      } else {
+        toast.error("There is no route there.");
+      }
+    })
   }
 };
 
