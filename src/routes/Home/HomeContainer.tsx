@@ -1,16 +1,22 @@
 import { getCode } from "lib/mapHelpers";
 import React from "react";
-import { Query } from "react-apollo";
+import { graphql, MutationFn, Query } from "react-apollo";
 import ReactDOM from 'react-dom';
 import { RouteComponentProps } from "react-router";
 import { toast } from 'react-toastify';
 import { USER_PROFILE } from "sharedQueries.queries";
-import { userProfile } from "../../types/api";
+import { 
+  reportMovement,
+  reportMovementVariables,
+  userProfile } from "../../types/api";
+import { REPORT_LOCATION } from './Home.queries';
 import HomePresenter from "./HomePresenter";
 
 interface IProps extends RouteComponentProps<any> {
   google: any;
+  reportLocation: MutationFn;
 }
+
 interface IState {
   isMenuOpen: boolean;
   toAddress: string;
@@ -18,6 +24,9 @@ interface IState {
   toLng: number;
   lat: number;
   lng: number;
+  distance: number;
+  duration: string;
+  price: number;
 }
 
 
@@ -31,9 +40,12 @@ class HomeContainer extends React.Component<IProps, IState> {
   public directions: google.maps.DirectionsRenderer | null = null;
 
   public state = {
+    distance: 0,
+    duration: "",
     isMenuOpen: false,
     lat: 0,
     lng: 0,
+    price: 0,
     toAddress: "",
     toLat: 0,
     toLng: 0,
@@ -52,7 +64,7 @@ class HomeContainer extends React.Component<IProps, IState> {
   }
 
   public render() {
-    const { isMenuOpen, toAddress } = this.state;
+    const { isMenuOpen, toAddress, price } = this.state;
     return (
       <ProfileQuery query={USER_PROFILE}>
         {({ loading }) => (
@@ -64,6 +76,7 @@ class HomeContainer extends React.Component<IProps, IState> {
             toAddress={toAddress}
             onInputChange={this.onInputChange}
             onAddressSubmit={this.onAddressSubmit}
+            price={price}
           />
         )}
       </ProfileQuery>
@@ -131,11 +144,18 @@ class HomeContainer extends React.Component<IProps, IState> {
   };
 
   public handleGeoWatchSuccess: PositionCallback = (position: Position) => {
+    const { reportLocation } = this.props;
     const {
       coords: { latitude: lat, longitude: lng }
     } = position;
     this.userMarker!.setPosition({ lat, lng });
     this.map!.panTo({ lat, lng });
+    reportLocation({
+      variables: {
+        lat,
+        lng
+      }
+    });
   }
   
   public handleGeoWatchError: PositionErrorCallback = () => {
@@ -211,15 +231,39 @@ class HomeContainer extends React.Component<IProps, IState> {
       travelMode: google.maps.TravelMode.DRIVING
     };
     
-    directionsService.route(directionsOptions, (result, status) => {
-      if (status === google.maps.DirectionsStatus.OK) {
-        this.directions!.setDirections(result);
-        this.directions!.setMap(this.map)
-      } else {
-        toast.error("There is no route there.");
-      }
-    })
+    directionsService.route(directionsOptions, this.handleRouteRequest);
   }
+  public handleRouteRequest = (
+    result: google.maps.DirectionsResult, 
+    status: google.maps.DirectionsStatus 
+  ) => {
+    const { google } = this.props;
+    if (status === google.maps.DirectionsStatus.OK) {
+      const { routes } = result;
+      const {
+        distance: { value: distance },
+        duration: { text: duration }
+      } = routes[0].legs[0];
+      this.setState({
+        distance,
+        duration,
+        price: this.carculatePrice(distance)
+      });
+      this.directions!.setDirections(result);
+      this.directions!.setMap(this.map);
+    } else {
+      toast.error("There is no route there.");
+    }
+  };
+
+  public carculatePrice = (distance: number) => {
+    return distance ? Number.parseFloat((distance * 0.003).toFixed(2)) : 0
+  };
 };
 
-export default HomeContainer;
+export default graphql<any, reportMovement, reportMovementVariables> (
+  REPORT_LOCATION,
+  {
+    name: "reportLocation"
+  }
+)(HomeContainer);
