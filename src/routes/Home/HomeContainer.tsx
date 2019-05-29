@@ -94,6 +94,7 @@ class HomeContainer extends React.Component<IProps, IState> {
                 onInputChange={this.onInputChange}
                 onAddressSubmit={this.onAddressSubmit}
                 price={price}
+                data={data}
               />
             )}
           </NearbyQuery>
