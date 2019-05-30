@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { USER_PROFILE } from "sharedQueries.queries";
 import { 
   getDrivers,
+  getRides,
   reportMovement,
   reportMovementVariables,
   requestRide,
@@ -14,6 +15,7 @@ import {
   userProfile } from "../../types/api";
 import { 
   GET_NEARBY_DRIVERS, 
+  GET_NEARBY_RIDE,
   REPORT_LOCATION,
   REQUEST_RIDE
 } from './Home.queries';
@@ -31,17 +33,18 @@ interface IState {
   toLng: number;
   lat: number;
   lng: number;
-  distance: number;
-  distanceString: string;
+  distance: string;
+  distanceValue: number;
   duration: string;
   price: number;
-  fromAddress: string
+  fromAddress: string;
+  isDriving: boolean;
 }
-
 
 class ProfileQuery extends Query<userProfile> {}
 class NearbyQuery extends Query<getDrivers> {}
 class RequestRideMutation extends Mutation<requestRide, requestRideVariables> {}
+class GetNearbyRides extends Query<getRides> {}
 
 class HomeContainer extends React.Component<IProps, IState> {
   public mapRef: any;
@@ -52,10 +55,11 @@ class HomeContainer extends React.Component<IProps, IState> {
   public drivers: google.maps.Marker[];
 
   public state = {
-    distance: 0,
-    distanceString: "",
+    distance: "",
+    distanceValue: 0,
     duration: "",
     fromAddress: "",
+    isDriving: true,
     isMenuOpen: false,
     lat: 0,
     lng: 0,
@@ -83,35 +87,31 @@ class HomeContainer extends React.Component<IProps, IState> {
       isMenuOpen, 
       toAddress, 
       price,
-      distanceString,
+      distance,
       fromAddress,
       lat,
       lng,
       toLat,
       toLng,
       duration,
+      isDriving,
     } = this.state;
 
     return (
-      <ProfileQuery query={USER_PROFILE}>
+      <ProfileQuery query={USER_PROFILE} onCompleted={this.handleProfileQuery}>
         {({ data, loading: profileLoading}) => (
           <NearbyQuery 
             query={GET_NEARBY_DRIVERS}
             pollInterval={1000}
-            skip={
-              !!( data &&
-                data.GetMyProfile &&
-                data.GetMyProfile.user &&
-                data.GetMyProfile.user.isDriving
-              )
-            }
+            skip={isDriving}
             onCompleted={this.handleNearbyDrivers}
           >
             {() => (
               <RequestRideMutation
                 mutation={REQUEST_RIDE}
+                onCompleted={this.handleRideRequest}
                 variables={{
-                  distance: distanceString,
+                  distance,
                   dropOffAddress: toAddress,
                   dropOffLat: toLat,
                   dropOffLng: toLng,
@@ -123,18 +123,22 @@ class HomeContainer extends React.Component<IProps, IState> {
                 }}
               >
                 {requestRideMutation => (
-                  <HomePresenter 
-                    loading={profileLoading}
-                    isMenuOpen={isMenuOpen} 
-                    toggleMenu={this.toggleMenu}
-                    mapRef={this.mapRef}
-                    toAddress={toAddress}
-                    onInputChange={this.onInputChange}
-                    onAddressSubmit={this.onAddressSubmit}
-                    price={price}
-                    data={data}
-                    requestRideMutation={requestRideMutation}
-                  />
+                  <GetNearbyRides query={GET_NEARBY_RIDE} skip={isDriving}>
+                    {(result) => ( console.log(result), 
+                      <HomePresenter 
+                        loading={profileLoading}
+                        isMenuOpen={isMenuOpen} 
+                        toggleMenu={this.toggleMenu}
+                        mapRef={this.mapRef}
+                        toAddress={toAddress}
+                        onInputChange={this.onInputChange}
+                        onAddressSubmit={this.onAddressSubmit}
+                        price={price}
+                        data={data}
+                        requestRideMutation={requestRideMutation}
+                      />
+                    )}
+                  </GetNearbyRides>
                 )}
               </RequestRideMutation>
             )}
@@ -173,6 +177,27 @@ class HomeContainer extends React.Component<IProps, IState> {
     if (address) {
       this.setState({
         fromAddress: address
+      });
+    }
+  };
+
+  public handleRideRequest = (data: requestRide) => {
+    const { RequestRide } = data;
+    if (RequestRide.ok) {
+      toast.success("Drive requested, finding a driver");
+    } else {
+      toast.error(RequestRide.error);
+    }
+  };
+
+  public handleProfileQuery = (data: userProfile) => {
+    const { GetMyProfile } = data;
+    if (GetMyProfile ) {
+      const {
+        user
+      } = GetMyProfile || { user: {}};
+      this.setState({
+        isDriving: user!.isDriving
       });
     }
   };
@@ -316,14 +341,14 @@ class HomeContainer extends React.Component<IProps, IState> {
     if (status === google.maps.DirectionsStatus.OK) {
       const { routes } = result;
       const {
-        distance: { value: distance, text: distanceString },
+        distance: { value: distanceValue, text: distance },
         duration: { text: duration }
       } = routes[0].legs[0];
       this.setState({
         distance,
-        distanceString,
+        distanceValue,
         duration,
-        price: this.carculatePrice(distance)
+        price: this.carculatePrice(distanceValue)
       });
       this.directions!.setDirections(result);
       this.directions!.setMap(this.map);
@@ -332,8 +357,8 @@ class HomeContainer extends React.Component<IProps, IState> {
     }
   };
 
-  public carculatePrice = (distance: number) => {
-    return distance ? Number.parseFloat((distance * 0.003).toFixed(2)) : 0
+  public carculatePrice = (distanceValue: number) => {
+    return distanceValue ? Number.parseFloat((distanceValue * 0.003).toFixed(2)) : 0
   };
 
   public handleNearbyDrivers = (data: {} | getDrivers) => {
