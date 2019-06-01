@@ -1,12 +1,13 @@
 import AddressBar from "components/AddressBar";
 import Button from "components/Button";
 import Menu from "components/Menu";
+import RidePopUp from 'components/RidePopUp';
 import React from "react";
 import { MutationFn } from "react-apollo";
 import Helmet from "react-helmet";
 import Sidebar from "react-sidebar";
 import styled from "../../typed-components";
-import { userProfile } from "../../types/api";
+import { getRides, userProfile } from "../../types/api";
 
 const Container = styled.div``;
 
@@ -54,6 +55,8 @@ interface IProps {
   price: number;
   data?: userProfile;
   requestRideMutation?: MutationFn;
+  nearbyRide: getRides | undefined;
+  acceptRideMutation?: MutationFn;
 }
 
 const HomePresenter: React.SFC<IProps> = ({
@@ -67,6 +70,8 @@ const HomePresenter: React.SFC<IProps> = ({
   price,
   data: { GetMyProfile: { user = null } = {} } = { GetMyProfile: {}},
   requestRideMutation,
+  nearbyRide: { GetNearbyRide } = { GetNearbyRide: null},
+  acceptRideMutation
 }) => (
   <Container>
     <Helmet>
@@ -107,6 +112,18 @@ const HomePresenter: React.SFC<IProps> = ({
           onClick={requestRideMutation}
           disabled={toAddress === ""}
           value={`Request Ride ($${price})`}
+        />
+      )}
+      {GetNearbyRide && GetNearbyRide.ride && (
+        <RidePopUp
+          id={GetNearbyRide.ride.id}
+          pickUpAddress={GetNearbyRide.ride.pickUpAddress}
+          dropOffAddress={GetNearbyRide.ride.dropOffAddress}
+          price={GetNearbyRide.ride.price}
+          distance={GetNearbyRide.ride.distance}
+          passengerName={GetNearbyRide.ride.passenger.fullName || ""}
+          passengerPhoto={GetNearbyRide.ride.passenger.profilePhoto || ""}
+          acceptRideMutation={acceptRideMutation}
         />
       )}
       <Map ref={mapRef}/>
