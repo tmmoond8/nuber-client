@@ -78,6 +78,7 @@ mutation acceptRide($rideId: Int!) {
   UpdateRideStatus(rideId: $rideId, status: ACCEPTED) {
     ok
     error
+    rideId
   }
 }
 `;
