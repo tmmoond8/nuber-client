@@ -7,7 +7,14 @@ import { MutationFn } from "react-apollo";
 import Helmet from "react-helmet";
 import Sidebar from "react-sidebar";
 import styled from "../../typed-components";
-import { getRides, userProfile } from "../../types/api";
+import { 
+  acceptRide,
+  acceptRideVariables, 
+  getRides, 
+  requestRide, 
+  requestRideVariables,
+  userProfile,
+} from "../../types/api";
 
 const Container = styled.div``;
 
@@ -54,9 +61,9 @@ interface IProps {
   onInputChange: React.ChangeEventHandler<HTMLInputElement>;
   price: number;
   data?: userProfile;
-  requestRideMutation?: MutationFn;
-  nearbyRide: getRides | undefined;
-  acceptRideMutation?: MutationFn;
+  requestRideMutation?: MutationFn<requestRide, requestRideVariables>;
+  nearbyRide?: getRides | undefined;
+  acceptRideMutation?: MutationFn<acceptRide, acceptRideVariables>;
 }
 
 const HomePresenter: React.SFC<IProps> = ({

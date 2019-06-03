@@ -52,7 +52,7 @@ class AcceptRide extends Mutation<acceptRide, acceptRideVariables> {}
 
 class HomeContainer extends React.Component<IProps, IState> {
   public mapRef: any;
-  public map: google.maps.Map;
+  public map: google.maps.Map | null = null;
   public userMarker: google.maps.Marker | null = null;
   public toMarker: google.maps.Marker | null = null;
   public directions: google.maps.DirectionsRenderer | null = null;
@@ -393,6 +393,7 @@ class HomeContainer extends React.Component<IProps, IState> {
   }
   public createDriverMarker = (driver) => {
     if(driver && driver.lastLat && driver.lastLng) {
+      const { google } = this.props;
       const markerOptions: google.maps.MarkerOptions = {
         icon: {
           path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
