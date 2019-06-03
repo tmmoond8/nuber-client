@@ -81,3 +81,19 @@ mutation acceptRide($rideId: Int!) {
   }
 }
 `;
+
+export const SUBSCRIBE_NEARBY_RIDE = gql`
+  subscription nearbyRides {
+    NearbyRideSubscription {
+      id
+      pickUpAddress
+      dropOffAddress
+      price
+      distance
+      passenger {
+        fullName
+        profilePhoto
+      }
+    }
+  }
+`;
