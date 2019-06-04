@@ -4,6 +4,8 @@ import { MutationFn } from "react-apollo";
 import styled from '../../typed-components';
 import { getRide, userProfile } from '../../types/api';
 
+const defaultProfile = "https://user-images.githubusercontent.com/11402468/58876263-7ee5fa80-8708-11e9-8eb7-b5ef5f2966d0.jpeg";
+
 const Container = styled.div`
   padding: 40px;
 `;
@@ -49,8 +51,7 @@ interface IProps {
 }
 
 const renderStatusButton = ({ ride, user, updateRideMutation }) => {
-  console.log(ride);
-  if (ride.driver.id === user.id ) {
+  if (ride.driver && ride.driver.id === user.id ) {
     if (ride.status === "ACCEPTED") {
       return (
         <ExtendedButton
@@ -93,16 +94,18 @@ const RidePresenter: React.SFC<IProps> = ({
     {ride && (
         <React.Fragment>
           <Title>Passenger</Title>
-          <Passenger>
-            <Img src={ride.passenger.profilePhoto!} />
-            <Data>{ride.passenger.fullName!}</Data>
-          </Passenger>
+          {ride.passenger && (
+            <Passenger>
+              <Img src={ride.passenger.profilePhoto || defaultProfile} />
+              <Data>{ride.passenger.fullName}</Data>
+            </Passenger>
+          )}
           {ride.driver && (
             <React.Fragment>
               <Title>Driver</Title>
               <Passenger>
-                <Img src={ride.driver.profilePhoto!} />
-                <Data>{ride.driver.fullName!}</Data>
+                <Img src={ride.driver.profilePhoto || defaultProfile} />
+                <Data>{ride.driver.fullName}</Data>
               </Passenger>
             </React.Fragment>
           )}

@@ -1,3 +1,4 @@
+import { SubscribeToMoreOptions } from 'apollo-client';
 import React from 'react';
 import { Mutation, Query } from 'react-apollo';
 import { RouteComponentProps } from 'react-router-dom';
@@ -9,7 +10,7 @@ import {
   updateRideVariables,
   userProfile 
 } from '../../types/api';
-import { GET_RIDE, UPDATE_RIDE_STATUS } from './Ride.queries';
+import { GET_RIDE, RIDE_SUBSCRIPTION, UPDATE_RIDE_STATUS } from './Ride.queries';
 import RidePresenter from './RidePresenter';
 
 class RideQuery extends Query<getRide, getRideVariables> {}
@@ -42,21 +43,26 @@ class RideContainer extends React.Component<IProps> {
       <ProfileQuery query={USER_PROFILE}>
         {({ data: userData }) => (
           <RideQuery query={GET_RIDE} variables={{ rideId: parseInt(rideId, 10) }}>
-            {({ data: rideData }) => (
-              <RideUpdate 
-                mutation={UPDATE_RIDE_STATUS}
-                refetchQueries={[{ query: GET_RIDE , variables: { rideId: parseInt(rideId, 10) }}]}
-              >
-                {updateRideMutation => (
-                  <RidePresenter 
-                    rideData={rideData}
-                    userData={userData}
-                    updateRideMutation={updateRideMutation}
-                  />
-                )}
-              </RideUpdate>
-              
-            )}
+            {({ data: rideData, loading, subscribeToMore }) => {
+              const subscribeOptions: SubscribeToMoreOptions = {
+                document: RIDE_SUBSCRIPTION
+              }
+              subscribeToMore(subscribeOptions);
+              return (
+                <RideUpdate 
+                  mutation={UPDATE_RIDE_STATUS}
+                  refetchQueries={[{ query: GET_RIDE , variables: { rideId: parseInt(rideId, 10) }}]}
+                >
+                  {updateRideMutation => (
+                    <RidePresenter 
+                      rideData={rideData}
+                      userData={userData}
+                      updateRideMutation={updateRideMutation}
+                    />
+                  )}
+                </RideUpdate>
+              )
+            }}
           </RideQuery>
         )}
       </ProfileQuery>
