@@ -1,7 +1,8 @@
 import Button from 'components/Button';
 import React from 'react';
+import { MutationFn } from "react-apollo";
 import styled from '../../typed-components';
-import { getRide } from '../../types/api';
+import { getRide, userProfile } from '../../types/api';
 
 const Container = styled.div`
   padding: 40px;
@@ -43,10 +44,50 @@ const ExtendedButton = styled(Button)`
 
 interface IProps {
   rideData?: getRide;
+  userData?: userProfile;
+  updateRideMutation: MutationFn;
+}
+
+const renderStatusButton = ({ ride, user, updateRideMutation }) => {
+  console.log(ride);
+  if (ride.driver.id === user.id ) {
+    if (ride.status === "ACCEPTED") {
+      return (
+        <ExtendedButton
+          value="Picked Up"
+          onClick={() => {
+            updateRideMutation({
+              variables: {
+                rideId: ride.id,
+                status: "ONROUTE"
+              }
+            })
+          }}
+        />
+      )
+    } else if (ride.status === "ONROUTE") {
+      return (
+        <ExtendedButton
+          value="Finished"
+          onClick={() => {
+            updateRideMutation({
+              variables: {
+                rideId: ride.id,
+                status: "FINISHED"
+              }
+            })
+          }}
+        />
+      )
+    }
+  }
+  return false;
 }
 
 const RidePresenter: React.SFC<IProps> = ({
   rideData: { GetRide: { ride = null } = {} } = { GetRide: { ride: null}},
+  userData: { GetMyProfile: { user = null } = {} } = { GetMyProfile: { user: null}},
+  updateRideMutation
 }) => (
   <Container>
     {ride && (
@@ -78,10 +119,7 @@ const RidePresenter: React.SFC<IProps> = ({
           <Title>Status</Title>
           <Data>{ride.status}</Data>
           <Buttons>
-            <ExtendedButton
-              value={"Picked Up"}
-              onClick={() =>""}
-            />
+            {renderStatusButton({ user, ride, updateRideMutation })}
           </Buttons>
         </React.Fragment>
       )}
