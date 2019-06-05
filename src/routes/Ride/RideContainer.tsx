@@ -45,13 +45,27 @@ class RideContainer extends React.Component<IProps> {
           <RideQuery query={GET_RIDE} variables={{ rideId: parseInt(rideId, 10) }}>
             {({ data: rideData, loading, subscribeToMore }) => {
               const subscribeOptions: SubscribeToMoreOptions = {
-                document: RIDE_SUBSCRIPTION
+                document: RIDE_SUBSCRIPTION,
+                updateQuery: (prev, { subscriptionData }) => {
+                  if (!subscriptionData.data) {
+                    return prev;
+                  }
+                  const {
+                    data: {
+                      RideStatusSubscription: { status }
+                    }
+                  } = subscriptionData;
+                  if (status === "FINISHED") {
+                    window.location.href = "/";
+                  }
+                }
               }
               subscribeToMore(subscribeOptions);
               return (
                 <RideUpdate 
                   mutation={UPDATE_RIDE_STATUS}
                   refetchQueries={[{ query: GET_RIDE , variables: { rideId: parseInt(rideId, 10) }}]}
+                  onCompleted={() => this.hanleRideUpdate(rideData)}
                 >
                   {updateRideMutation => (
                     <RidePresenter 
@@ -67,6 +81,15 @@ class RideContainer extends React.Component<IProps> {
         )}
       </ProfileQuery>
     )
+  }
+
+  public hanleRideUpdate(rideData) {
+    const { 
+      GetRide
+    } = rideData;
+    if (GetRide && GetRide.ride.status === "ONROUTE") {
+      window.location.href = "/";
+    }
   }
 }
 
