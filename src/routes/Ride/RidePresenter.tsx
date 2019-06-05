@@ -1,6 +1,7 @@
 import Button from 'components/Button';
 import React from 'react';
 import { MutationFn } from "react-apollo";
+import { Link } from 'react-router-dom';
 import styled from '../../typed-components';
 import { getRide, userProfile } from '../../types/api';
 
@@ -51,7 +52,7 @@ interface IProps {
 }
 
 const renderStatusButton = ({ ride, user, updateRideMutation }) => {
-  if (ride.driver && ride.driver.id === user.id ) {
+  if (ride.driver && user && ride.driver.id === user.id ) {
     if (ride.status === "ACCEPTED") {
       return (
         <ExtendedButton
@@ -91,7 +92,7 @@ const RidePresenter: React.SFC<IProps> = ({
   updateRideMutation
 }) => (
   <Container>
-    {ride && (
+    {ride && ( 
         <React.Fragment>
           <Title>Passenger</Title>
           {ride.passenger && (
@@ -123,6 +124,11 @@ const RidePresenter: React.SFC<IProps> = ({
           <Data>{ride.status}</Data>
           <Buttons>
             {renderStatusButton({ user, ride, updateRideMutation })}
+            {ride.status !== "REQUESTING" && (
+              <Link to={`/chat/${ride.chatId}`}>
+                <ExtendedButton value="Chat" onClick={null} />
+              </Link>
+            )}
           </Buttons>
         </React.Fragment>
       )}

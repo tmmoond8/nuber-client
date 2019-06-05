@@ -70,6 +70,43 @@ export interface addPlaceVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: getChat
+// ====================================================
+
+export interface getChat_GetChat_chat_messages {
+  __typename: "Message";
+  id: number;
+  text: string;
+  userId: number | null;
+}
+
+export interface getChat_GetChat_chat {
+  __typename: "Chat";
+  passengerId: number;
+  driverId: number;
+  messages: (getChat_GetChat_chat_messages | null)[];
+}
+
+export interface getChat_GetChat {
+  __typename: "GetChatResponse";
+  ok: boolean;
+  error: string | null;
+  chat: getChat_GetChat_chat | null;
+}
+
+export interface getChat {
+  GetChat: getChat_GetChat;
+}
+
+export interface getChatVariables {
+  chatId: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL mutation operation: updateProfile
 // ====================================================
 
@@ -312,7 +349,7 @@ export interface getRide_GetRide_ride {
   price: number;
   distance: string;
   duration: string;
-  driver: getRide_GetRide_ride_driver;
+  driver: getRide_GetRide_ride_driver | null;
   passenger: getRide_GetRide_ride_passenger;
   chatId: number | null;
 }
@@ -387,7 +424,7 @@ export interface rideUpdate_RideStatusSubscription {
   price: number;
   distance: string;
   duration: string;
-  driver: rideUpdate_RideStatusSubscription_driver;
+  driver: rideUpdate_RideStatusSubscription_driver | null;
   passenger: rideUpdate_RideStatusSubscription_passenger;
   chatId: number | null;
 }
